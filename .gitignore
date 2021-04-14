@@ -1,6 +1,10 @@
 ### project specific files ###
 
 
+# segmentation models stuff
+seg_models/data/
+seg_models/*.ipynb
+
 ### Python boilerplate gitignore ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
