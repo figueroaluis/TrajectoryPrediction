@@ -5,7 +5,7 @@ import torchvision.models as models
 
 def set_up_vgg16(pretrained=False):
     '''
-    Sets up VGG-16 model without the maxpool2d layers
+    Sets up VGG-16 model without the maxpool2d layers.
     '''
     vgg = models.vgg16(pretrained)
     features = list(vgg.features.children())
@@ -19,11 +19,25 @@ def set_up_vgg16(pretrained=False):
 
 def set_up_resnet18(pretrained=False):
     '''
-    Setes up ResNet-18 model.
+    Sets up ResNet-18 model.
     '''
     resnet = models.resnet18(pretrained)
     features = list(resnet.children())
-    enc1 = nn.Sequential(*features[0:4])
+    enc1 = nn.Sequential(*features[0:3])
+    enc2 = nn.Sequential(*features[4])
+    enc3 = nn.Sequential(*features[5])
+    enc4 = nn.Sequential(*features[6])
+    enc5 = nn.Sequential(*features[7])
+
+    return enc1, enc2, enc3, enc4, enc5
+
+def set_up_resnext50(pretrained=False):
+    '''
+    Sets up ResNeXt-50_32x4d model.
+    '''
+    resnext = models.resnext50_32x4d(pretrained)
+    features = list(resnext.children())
+    enc1 = nn.Sequential(*features[0:3])
     enc2 = nn.Sequential(*features[4])
     enc3 = nn.Sequential(*features[5])
     enc4 = nn.Sequential(*features[6])
