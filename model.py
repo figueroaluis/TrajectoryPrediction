@@ -29,13 +29,15 @@ class CNN(nn.Module):
         return self.dense(feats)
 
 class SceneGRU(nn.Module):    
-    def __init__(self, hidden_dim = 128):
+    def __init__(self, hidden_dim = 128, train_steps = 8):
         super(SceneGRU, self).__init__()
+        self.train_steps = train_steps
         self.cnn = CNN()
         self.sceneGRU = nn.GRU(input_size = 256, hidden_size = hidden_dim, batch_first = True, dropout = 0.2) #why input = 512, batch_first?
     
     def forward(self, input):
         cnn_features = self.cnn(input)
+        cnn_features = cnn_features.unsqueeze(dim=1).repeat(1, self.train_steps, 1) # repeating each feature in batch for 8 steps
         return self.sceneGRU(cnn_features)[1]
 
 class GroupGRU(nn.Module):    
@@ -71,17 +73,19 @@ class PersonGRU(nn.Module):
         return self.personGRU(features)[1]
 
 class Encoder(nn.Module):
-    def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45):
+    def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12):
         super(Encoder, self).__init__()
-        self.personModel = PersonGRU(hidden_dim)
-        self.groupModel = GroupGRU(hidden_dim, neighborhood_radius, grid_radius, grid_angle)
-        self.sceneModel = SceneGRU(hidden_dim)
+        self.personModel = PersonGRU(hidden_dim = hidden_dim)
+        self.groupModel = GroupGRU(hidden_dim = hidden_dim, neighborhood_radius = neighborhood_radius, grid_radius = grid_radius, grid_angle = grid_angle)
+        self.sceneModel = SceneGRU(hidden_dim = hidden_dim, train_steps = train_steps)
+        self.predict_steps = predict_steps
 
     def forward(self, images, group_features, person_features):
         output = self.personModel(person_features)
         output += self.groupModel(group_features)
-        output += self.sceneModel(images)
+        output += self.sceneModel(images)        
         output = output.permute(1,0,2)
+        output = output.repeat(1,self.predict_steps,1)
         return output
 
 class Decoder(nn.Module):
