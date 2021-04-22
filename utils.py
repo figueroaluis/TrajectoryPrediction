@@ -259,8 +259,7 @@ def group_model_input(obs, observed_frame_num, neighborhood_size, dimensions, gr
     for pedIndex in range(len(obs)):
         group_pedIndex = []
         for i in range(observed_frame_num):
-            o_map_pedIndex = get_rectangular_occupancy_map(obs[pedIndex][i][1], obs[pedIndex][i][0], dimensions,
-                                                           neighborhood_size, grid_size, raw_data)
+            o_map_pedIndex = get_rectangular_occupancy_map(obs[pedIndex][i][1], obs[pedIndex][i][0], dimensions,  neighborhood_size, grid_size, raw_data)
             o_map_pedIndex = np.reshape(o_map_pedIndex, [int(neighborhood_size / grid_size) ** 2, ])
             group_pedIndex.append(o_map_pedIndex)
         group_pedIndex = np.reshape(group_pedIndex, [observed_frame_num, int(neighborhood_size / grid_size) ** 2])
@@ -272,15 +271,13 @@ def group_model_input(obs, observed_frame_num, neighborhood_size, dimensions, gr
     return group_model_input
 
 
-def circle_group_model_input(obs, observed_frame_num, neighborhood_size, dimensions, neighborhood_radius, grid_radius,
-                             grid_angle, circle_map_weights, raw_data):
+def circle_group_model_input(obs, observed_frame_num, neighborhood_size, dimensions, neighborhood_radius, grid_radius, grid_angle, circle_map_weights, raw_data):
     group_model_input = []
 
     for pedIndex in range(len(obs)):
         group_pedIndex = []
         for i in range(observed_frame_num):
-            o_map_pedIndex = get_circle_occupancy_map(obs[pedIndex][i][1], obs[pedIndex][i][0], dimensions,
-                                                      neighborhood_radius, grid_radius, grid_angle, raw_data)
+            o_map_pedIndex = get_circle_occupancy_map(obs[pedIndex][i][1], obs[pedIndex][i][0], dimensions, neighborhood_radius, grid_radius, grid_angle, raw_data)
             o_map_pedIndex = np.reshape(o_map_pedIndex, [-1, ])
             group_pedIndex.append(o_map_pedIndex)
         group_pedIndex = np.reshape(group_pedIndex, [observed_frame_num, -1])
@@ -299,8 +296,7 @@ def log_group_model_input(obs, observed_frame_num, neighborhood_size, dimensions
     for pedIndex in range(len(obs)):
         group_pedIndex = []
         for i in range(observed_frame_num):
-            o_map_pedIndex = log_circle_occupancy_map(obs[pedIndex][i][1], obs[pedIndex][i][0], dimensions,
-                                                      neighborhood_radius, grid_radius, grid_angle, raw_data)
+            o_map_pedIndex = log_circle_occupancy_map(obs[pedIndex][i][1], obs[pedIndex][i][0], dimensions,neighborhood_radius, grid_radius, grid_angle, raw_data)
             o_map_pedIndex = np.reshape(o_map_pedIndex, [-1, ])
             group_pedIndex.append(o_map_pedIndex)
         group_pedIndex = np.reshape(group_pedIndex, [observed_frame_num, -1])
