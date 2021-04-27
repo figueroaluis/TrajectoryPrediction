@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import numpy as np
 import argparse
 from data import BaseDataset
@@ -25,3 +26,6 @@ if __name__ == "__main__":
     epochs = args.num_epochs
     train_dataset = BaseDataset(args.data_dir + "/obs.npy", args.data_dir + "/pred.npy", args.data_dir + "/pixel_pos.csv", args.image_dir)
     trainloader = DataLoader(train_dataset, args.batch_size, shuffle=False, num_workers = args.num_workers)    
+
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(weight_decay = 1e-5)
