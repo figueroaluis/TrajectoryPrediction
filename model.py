@@ -102,7 +102,7 @@ class Model(nn.Module):
     def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12, decoder_input_size = 128):
         super(Model, self).__init__()
         self.encoder = Encoder(hidden_dim=hidden_dim, neighborhood_radius=neighborhood_radius, grid_radius=grid_radius, grid_angle=grid_angle, train_steps=train_steps, predict_steps=predict_steps)
-        self.decoder = Decoder(decoder_input_size = 128, hidden_dim=hidden_dim)
+        self.decoder = Decoder(decoder_input_size = decoder_input_size, hidden_dim=hidden_dim)
 
     def forward(self, images, group_features, person_features, encoder_feats):
         encoder_output = self.encoder(images, group_features, person_features)
