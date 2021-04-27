@@ -4,7 +4,6 @@ import numpy as np
 import math
 
 from occupancy import get_rectangular_occupancy_map
-from occupancy import NYGC_rectangular_occupancy_map
 from occupancy import get_circle_occupancy_map, log_circle_occupancy_map
 
 
@@ -106,6 +105,10 @@ class DataProcesser:
         expected_ouput = np.reshape(expected_ouput, [len(self.pred), self.pred_length, 2])
 
         return expected_ouput
+    
+    def save_files(self, data_dir):
+        np.save(data_dir +"/obs.npy", self.obs)
+        np.save(data_dir +"/pred.npy", self.obs)
 
 
 # NYGC processing
