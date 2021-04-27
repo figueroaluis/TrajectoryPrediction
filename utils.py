@@ -108,7 +108,7 @@ class DataProcesser:
     
     def save_files(self, data_dir):
         np.save(data_dir +"/obs.npy", self.obs)
-        np.save(data_dir +"/pred.npy", self.obs)
+        np.save(data_dir +"/pred.npy", self.pred)
 
 
 # NYGC processing
