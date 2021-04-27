@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 from PIL import Image
 import torch
@@ -30,7 +29,7 @@ class BaseDataset(Dataset):
         self.transformations = transforms.Compose([
             transforms.ToTensor()
         ])
-        self.ground_truth = model_expected_ouput(self.pred, self.pred_steps)
+        self.ground_truth = model_expected_ouput(self.pred, self.pred_steps) #(num_obs, 12, 2)
     
     def __len__(self):
         return len(self.obs)
@@ -46,7 +45,8 @@ class BaseDataset(Dataset):
         input_data = {}
         input_data['person_data'] = self.person_data[index]
         input_data['group_data'] = self.group_data[index]
-        input_data['image']  = img       
+        input_data['scene_data']  = img  
+        input_data['gt'] = self.ground_truth[index] 
         return input_data
 
     def load_image(self, data_dir, subset, frame_ID):
