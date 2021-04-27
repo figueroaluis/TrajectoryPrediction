@@ -17,9 +17,9 @@ class BaseDataset(Dataset):
         self.pred_steps = 12
         #TODO: call utils api to split data into person, group, scene data        
 
-        self.person_data = person_model_input(self.obs, self.train_steps)        
-        self.group_data = log_group_model_input(self.obs, self.train_steps, neighborhood_size, image_size_dims, neighborhood_radius, grid_radius, grid_angle, [1, 1, 1, 1, 1, 1, 1, 1], self.raw_data)
-        self.scene_data = None
+        self.person_data = person_model_input(self.obs, self.train_steps) #(num_obs, 8, 2)      
+        self.group_data = log_group_model_input(self.obs, self.train_steps, neighborhood_size, image_size_dims, neighborhood_radius, grid_radius, grid_angle, [1, 1, 1, 1, 1, 1, 1, 1], self.raw_data) #(num_obs, 8, -1)
+        # self.scene_data = None #(num_obs, 3, 720, 576)
 
         self.ground_truth = model_expected_ouput(self.pred, self.pred_steps)
     
@@ -28,4 +28,9 @@ class BaseDataset(Dataset):
     
     def __getitem__(self, index):
         
+        input_data = {}
+        input_data['person_data'] = self.person_data[index]
+        input_data['group_data'] = self.group_data[index]
+        input_data['image']  = self.scene_data[index]        
+        return input_data
 
