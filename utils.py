@@ -2,16 +2,16 @@ import os
 import numpy as np
 
 import math
-
+import os
 from occupancy import get_rectangular_occupancy_map
 from occupancy import get_circle_occupancy_map, log_circle_occupancy_map
 
 
 class DataProcesser:
 
-    def __init__(self,observed_frame_num, predicting_frame_num): # ,dup_threshold):
+    def __init__(self,data_dir,observed_frame_num, predicting_frame_num): # ,dup_threshold):
  
-        self.file_path = 'pixel_pos.csv'
+        self.file_path = os.path.join(data_dir,'pixel_pos.csv')
         #self.dup_threshold = dup_threshold
         self.raw_data = None
         self.ped_num = None
@@ -147,8 +147,8 @@ def get_all_trajectory(total_pedestrian_num):
 
 
 def preprocess(data_dir):
-    file_path = os.path.join(data_dir, 'pixel_pos.csv')
-    data = np.genfromtxt(file_path, delimiter=',')
+    
+    data = np.genfromtxt(data_dir, delimiter=',')
     numPeds = np.size(np.unique(data[1, :]))
 
     return data, numPeds

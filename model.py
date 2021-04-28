@@ -7,25 +7,27 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
         self.cnn = nn.Sequential(
             nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=3),
-            nn.MaxPool2D(kernel_size = 3, stride = 2),
+            nn.MaxPool2d(kernel_size = 3, stride = 2),
             nn.BatchNorm2d(num_features = 96, momentum = 0.8),
             nn.Conv2d(96, 256, kernel_size=3, stride=1, padding=2), 
-            nn.MaxPool2D(kernel_size = 3, stride = 2),
+            nn.MaxPool2d(kernel_size = 3, stride = 2),
             nn.BatchNorm2d(num_features = 256, momentum = 0.8),
             nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
-            nn.MaxPool2D(kernel_size = 3, stride = 2)
+            nn.MaxPool2d(kernel_size = 3, stride = 2)
         )    
-        inp = 91392 # dim after flatten. can define in terms of ip_width, ip_height 
+        inp = 95744 # dim after flatten. can define in terms of ip_width, ip_height 
         self.dense = nn.Sequential(            
             nn.Linear(inp, 512),
             nn.ReLU(inplace = True),
-            nn.Linear(inp, 256),
+            nn.Linear(512, 256),
             nn.ReLU(inplace = True)
         )
 
     def forward(self, image):
         cnn_feats = self.cnn(image)
-        feats = torch.flatten(cnn_feats)
+        # print(cnn_feats.size())
+        feats = cnn_feats.view(-1, 95744)
+        # print(feats.size())
         return self.dense(feats)
 
 class SceneGRU(nn.Module):    
@@ -91,19 +93,19 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, input_size = 128, hidden_dim = 128):
         super(Decoder, self).__init__()
-        self.decoderGRU = nn.GRU(input_size = input_size, hidden_dim = hidden_dim, batch_first = True, dropout = 0.2)
+        self.decoderGRU = nn.GRU(input_size = input_size, hidden_size = hidden_dim, batch_first = True, dropout = 0.2)
         self.dense = nn.Linear(128, 2)
     
     def forward(self, encoder_output):
-        decoder_out, _ = self.decoder(encoder_output)
+        decoder_out, _ = self.decoderGRU(encoder_output)
         return self.dense(decoder_out)
 
 class Model(nn.Module):
     def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12, decoder_input_size = 128):
         super(Model, self).__init__()
         self.encoder = Encoder(hidden_dim=hidden_dim, neighborhood_radius=neighborhood_radius, grid_radius=grid_radius, grid_angle=grid_angle, train_steps=train_steps, predict_steps=predict_steps)
-        self.decoder = Decoder(decoder_input_size = decoder_input_size, hidden_dim=hidden_dim)
+        self.decoder = Decoder(input_size = decoder_input_size, hidden_dim=hidden_dim)
 
-    def forward(self, images, group_features, person_features, encoder_feats):
+    def forward(self, images, group_features, person_features):
         encoder_output = self.encoder(images, group_features, person_features)
         return self.decoder(encoder_output)

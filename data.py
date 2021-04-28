@@ -14,7 +14,7 @@ class BaseDataset(Dataset):
         self.obs = np.load(obs_path) # obs_path should combine files from all sources or we should provide separate paths for separate datasets
         self.pred = np.load(pred_path)
 
-        self.raw_data = preprocess(raw_path)
+        self.raw_data,_ = preprocess(raw_path)
 
         self.image_dir = image_dir
         self.train_steps = 8
@@ -37,7 +37,7 @@ class BaseDataset(Dataset):
     def __getitem__(self, index):
         sample = self.obs[index] # 1x8x4
         frame_ID = sample[-1][1] # gets the frame ID
-        img = self.load_image(self.image_dir, 'seq_hotel/frames', frame_ID)
+        img = self.load_image(self.image_dir, frame_ID)
 
         img = self.transformations(img)
         
@@ -49,7 +49,7 @@ class BaseDataset(Dataset):
         input_data['gt'] = self.ground_truth[index] 
         return input_data
 
-    def load_image(self, data_dir, subset, frame_ID):
+    def load_image(self, data_dir, frame_ID):
         '''
         args:
             data_dir - data root directory
@@ -59,13 +59,14 @@ class BaseDataset(Dataset):
         out:
             img np.array
         '''
-        if subset == 'seq_hotel/frames':
-            assert ((frame_ID <= 18060) and (frame_ID >= 0))
-        if subset == 'seq_eth/frames':
-            assert ((frame_ID <= 12381) and (frame_ID >= 780))
+        # if subset == 'seq_hotel/frames':
+        #     assert ((frame_ID <= 18060) and (frame_ID >= 0))
+        # if subset == 'seq_eth/frames':
+        #     assert ((frame_ID <= 12381) and (frame_ID >= 780))
 
         _img_ext = '-U.png'
-        img_path = os.path.join(data_dir, subset, str(frame_ID + 1) + _img_ext)
+
+        img_path = os.path.join(data_dir, str(int(frame_ID + 1)) + _img_ext)
         img = np.array(Image.open(img_path))
 
         # assert list(img.shape[:2]) == self.image_size_dims[::-1]
