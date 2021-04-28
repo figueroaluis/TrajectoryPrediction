@@ -6,8 +6,11 @@ import torchvision.models as models
 
 class CustomCNN(nn.Module):
     def __init__(self, encoder_name = 'resnext', pretrained = True, input_width = 720, input_height = 576):
-        super(CNN, self).__init__()
-        if encoder_name == 'resnext':
+        super(CustomCNN, self).__init__()
+        if encoder_name == 'vgg':
+            setup_encoder = self._setup_vgg_encoder
+            self.inp = 202752
+        elif encoder_name == 'resnext':
             setup_encoder = self._setup_resnext_encoder
             self.inp = 847872
         elif encoder_name == 'resnet':
@@ -25,7 +28,6 @@ class CustomCNN(nn.Module):
         cnn_feats = self.cnn(image)
         feats = cnn_feats.view(-1, self.inp)
         return self.dense(feats)
-    
     
     def _setup_resnet_encoder(self, pretrained=True):
         '''
@@ -54,5 +56,20 @@ class CustomCNN(nn.Module):
 
         ### drop the classifier at the end
         encoder = nn.Sequential(*list(model.children())[:8])
+
+        return encoder
+    
+    def _setup_vgg_encoder(self, pretrained=True):
+        '''
+        Sets up VGG-16 model.
+        '''
+        model = models.vgg16(pretrained)
+        if pretrained:
+            ### sanity check to freeze all model parameters
+            for parameter in model.parameters():
+                parameter.requires_grad = False
+
+        ### drop the classifier at the end
+        encoder = nn.Sequential(*list(model.features.children()))
 
         return encoder
