@@ -1,5 +1,12 @@
 ### project specific files ###
 
+# ignore the data directory, too large
+data/
+
+# segmentation models stuff
+seg_models/data/
+seg_models/*.ipynb
+*.ipynb
 
 ### Python boilerplate gitignore ###
 # Byte-compiled / optimized / DLL files
