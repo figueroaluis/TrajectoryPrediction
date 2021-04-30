@@ -54,12 +54,17 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=4e-4)    
     args = parser.parse_args()
 
-    if not os.path.exists(args.data_dir + "/obs.npy"):                    
-        dp = DataProcesser(args.data_dir, 8, 12)
-        dp.save_files(args.data_dir)
+    datasets_names_list = [] #TODO: add dataset names here
+
+    for i, data_path in enumerate(datasets_names_list):  
+        datasets_names_list[i] = args.data_dir +"/"+ data_path
+        data_path = args.data_dir +"/"+ data_path  
+        if not os.path.exists(data_path + "/obs.npy"):                    
+            dp = DataProcesser(data_path, 8, 12)
+            dp.save_files(data_path)        
 
     epochs = args.num_epochs
-    train_dataset = BaseDataset(args.data_dir + "/obs.npy", args.data_dir + "/pred.npy", args.data_dir + "/pixel_pos.csv", args.data_dir+"/frames/")
+    train_dataset = BaseDataset(datasets_names_list, args.data_dir+"/frames/") # TODO: frames is still single path
     trainloader = DataLoader(train_dataset, args.batch_size, shuffle=False, num_workers = args.num_workers)    
 
     model = Model()

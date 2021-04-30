@@ -106,7 +106,7 @@ class DataProcesser:
 
         return expected_ouput
     
-    def save_files(self, data_dir):
+    def save_files(self, data_dir): #data_dir here is combination of data_dir and dataset name
         np.save(data_dir +"/obs.npy", self.obs)
         np.save(data_dir +"/pred.npy", self.pred)
 
