@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import os
 import numpy as np
 from PIL import Image
@@ -173,5 +172,3 @@ class BaseDataset(Dataset): #TODO: image_dir is still single path
         # assert list(img.shape[:2]) == self.image_size_dims[::-1]
 
         return img
-
->>>>>>> 3f66e1d1e736b6c78b2f69e686866892d76a771f

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import torch
 import torch.nn as nn
 import numpy as np
@@ -204,6 +203,4 @@ if __name__ == "__main__":
 
     
     train(model,criterion, optimizer, trainloader, None, 10)
-
->>>>>>> 3f66e1d1e736b6c78b2f69e686866892d76a771f
     
