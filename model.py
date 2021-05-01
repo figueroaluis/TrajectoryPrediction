@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from encoders.encoders import CustomCNN
+import pdb
 
 class CNN(nn.Module):
     def __init__(self, input_width = 720, input_height = 576):
@@ -31,10 +33,13 @@ class CNN(nn.Module):
         return self.dense(feats)
 
 class SceneGRU(nn.Module):    
-    def __init__(self, hidden_dim = 128, train_steps = 8):
+    def __init__(self, hidden_dim = 128, train_steps = 8, cnn = 'baseline'):
         super(SceneGRU, self).__init__()
-        self.train_steps = train_steps
-        self.cnn = CNN()
+        self.train_steps = train_steps        
+        if cnn == 'baseline':
+            self.cnn = CNN()
+        else:
+            self.cnn = CustomCNN() #TODO: change cnn here for resnext
         self.sceneGRU = nn.GRU(input_size = 256, hidden_size = hidden_dim, batch_first = True, dropout = 0.2) #why input = 512, batch_first?
     
     def forward(self, input):
@@ -67,19 +72,18 @@ class PersonGRU(nn.Module):
             nn.ReLU(inplace = True)
         )
 
-        self.personGRU = nn.GRU(input_size = 64, hidden_size = hidden_dim, batch_first = True, dropout = 0.2) # how will this interact with previous layer, batch_first?
-
+        self.personGRU = nn.GRU(input_size = 64, hidden_size = hidden_dim, batch_first = True, dropout = 0.2)
 
     def forward(self, input):
         features = self.dense(input)
         return self.personGRU(features)[1]
 
 class Encoder(nn.Module):
-    def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12):
+    def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12, cnn = 'baseline'):
         super(Encoder, self).__init__()
         self.personModel = PersonGRU(hidden_dim = hidden_dim)
         self.groupModel = GroupGRU(hidden_dim = hidden_dim, neighborhood_radius = neighborhood_radius, grid_radius = grid_radius, grid_angle = grid_angle)
-        self.sceneModel = SceneGRU(hidden_dim = hidden_dim, train_steps = train_steps)
+        self.sceneModel = SceneGRU(hidden_dim = hidden_dim, train_steps = train_steps, cnn = cnn)
         self.predict_steps = predict_steps
 
     def forward(self, images, group_features, person_features):
@@ -101,10 +105,10 @@ class Decoder(nn.Module):
         return self.dense(decoder_out)
 
 class Model(nn.Module):
-    def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12, decoder_input_size = 128):
+    def __init__(self, hidden_dim = 128, neighborhood_radius = 32, grid_radius = 4, grid_angle = 45, train_steps = 8, predict_steps = 12, decoder_input_size = 128, cnn = 'baseline'):
         super(Model, self).__init__()
-        self.encoder = Encoder(hidden_dim=hidden_dim, neighborhood_radius=neighborhood_radius, grid_radius=grid_radius, grid_angle=grid_angle, train_steps=train_steps, predict_steps=predict_steps)
-        self.decoder = Decoder(input_size = decoder_input_size, hidden_dim=hidden_dim)
+        self.encoder = Encoder(hidden_dim=hidden_dim, neighborhood_radius=neighborhood_radius, grid_radius=grid_radius, grid_angle=grid_angle, train_steps=train_steps, predict_steps=predict_steps, cnn = cnn)
+        self.decoder = Decoder(input_size = decoder_input_size, hidden_dim=hidden_dim)        
 
     def forward(self, images, group_features, person_features):
         encoder_output = self.encoder(images, group_features, person_features)
