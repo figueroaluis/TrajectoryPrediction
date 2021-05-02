@@ -5,8 +5,9 @@ from torch import nn
 import torchvision.models as models
 
 class CustomCNN(nn.Module):
-    def __init__(self, encoder_name = 'resnext', pretrained = True, input_width = 720, input_height = 576):
+    def __init__(self, encoder_name = 'resnext', pretrained = False, attention = False, input_width = 720, input_height = 576):
         super(CustomCNN, self).__init__()
+        self.attn = attention
         if encoder_name == 'vgg':
             setup_encoder = self._setup_vgg_encoder
             self.inp = 202752
@@ -17,6 +18,7 @@ class CustomCNN(nn.Module):
             setup_encoder = self._setup_resnet_encoder
             self.inp = 211968
         self.cnn = setup_encoder(pretrained)
+            
         self.dense = nn.Sequential(            
             nn.Linear(self.inp, 512),
             nn.ReLU(inplace = True),
@@ -26,8 +28,12 @@ class CustomCNN(nn.Module):
 
     def forward(self, image):
         cnn_feats = self.cnn(image)
-        feats = cnn_feats.view(-1, self.inp)
-        return self.dense(feats)
+        
+        if self.attn:
+            return cnn_feats
+        else:
+            feats = cnn_feats.view(-1, self.inp)
+            return self.dense(feats)
     
     def _setup_resnet_encoder(self, pretrained=True):
         '''
@@ -49,10 +55,10 @@ class CustomCNN(nn.Module):
         Sets up ResNeXt-50_32x4d model.
         '''
         model = models.resnext50_32x4d(pretrained)
-        if pretrained:
-            ### sanity check to freeze all model parameters
-            for parameter in model.parameters():
-                parameter.requires_grad = False
+        # if pretrained:
+        #     ### sanity check to freeze all model parameters
+        #     for parameter in model.parameters():
+        #         parameter.requires_grad = False
 
         ### drop the classifier at the end
         encoder = nn.Sequential(*list(model.children())[:8])
