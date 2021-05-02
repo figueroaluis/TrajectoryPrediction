@@ -1,4 +1,4 @@
-### project specific files ###
+## project specific files ###
 
 # ignore the data directory, too large
 data/
@@ -7,6 +7,8 @@ data/
 seg_models/data/
 seg_models/*.ipynb
 *.ipynb
+deeplabv3/*.ipynb
+
 
 ### Python boilerplate gitignore ###
 # Byte-compiled / optimized / DLL files
