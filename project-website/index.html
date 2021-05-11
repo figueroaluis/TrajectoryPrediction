@@ -32,25 +32,27 @@
 							</figure>
 
 							<!-- Starting body content -->
-							<h2>Motivation</h2>
+							<h2>Motivation and Task</h2>
 							<p>Trajectory Prediction is the problem of predicting the short-term and long-term spatial coordinates of various road-agents such as cars, buses, pedestrians etc. Accurate and robust trajectory prediction is critical 
 							for the advancement of autonomous vehicles as it allows for better maneuverability in dense urban environments. As such, modeling pedestrian motion is non-trivial, as human motion paths are affected by environmental factors, 
 							leading to many plausible ways by which people could move. These movements vary, especially in complicated scenes where pedestrians move around obstacles such as trees, garbage bins, or benches. In addition, occlusion presents an additional challenge when tracking pedestrians. 
 							In this project, we wish to explore the use of segmentation information, in addition to a subject's movement and social interactions, to improve the trajectory prediction of pedestrians. Semantic segmentation can provide us with contextual information which can be used as a constraint to predict movements that are physically possible. 
 							This can further be expanded to include only socially acceptable movements, e.g. movements on a sidewalk and not on top of a car.</p>
-
+							<p>For this project, we define our task as follows:
+							Given a scene with multiple human subjects, we observe the spatial coordinates of the person of interest for the first 5 steps and then predict their trajectory for the next 5 steps, or 2 seconds into the future
+								</p>
 							<!-- Framework/Pipeline content -->
 							<h2>Framework</h2>
 							<h4><i>Encoding Branches</i></h4>
 							<figure>
 								<span class="image main">
 									<img src="images/framework_main_branches.png" alt="" />
-									<figcaption>Figure 2. Three main branches of the NAME framework.</figcaption>
+									<figcaption>Figure 2. Three main branches of the baseline framework.</figcaption>
 								</span>
 							</figure>
-							<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis. Praesent rutrum sem diam, vitae egestas enim auctor sit amet. Pellentesque leo mauris, consectetur id ipsum sit amet, fergiat. Pellentesque in mi eu massa lacinia malesuada et a elit. Donec urna ex, lacinia in purus ac, pretium pulvinar mauris. Curabitur sapien risus, commodo eget turpis at, elementum convallis elit. Pellentesque enim turpis, hendrerit tristique.</p>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dapibus rutrum facilisis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam tristique libero eu nibh porttitor fermentum. Nullam venenatis erat id vehicula viverra. Nunc ultrices eros ut ultricies condimentum. Mauris risus lacus, blandit sit amet venenatis non, bibendum vitae dolor. Nunc lorem mauris, fringilla in aliquam at, euismod in lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In non lorem sit amet elit placerat maximus. Pellentesque aliquam maximus risus, vel venenatis mauris vehicula hendrerit.</p>
-							<p>Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis. Praesent rutrum sem diam, vitae egestas enim auctor sit amet. Pellentesque leo mauris, consectetur id ipsum sit amet, fersapien risus, commodo eget turpis at, elementum convallis elit. Pellentesque enim turpis, hendrerit tristique lorem ipsum dolor.</p>
+							<p>We start by encoding the spatial coordinates of the subject. We first use a linear layer to encode each pair of coordinates into 64 features and pass it through a non linearity. These encoded features are then passed through a GRU at every training time step. The final output of the GRU acts as our person features.</p>
+							<p>Next, we look at the social interactions of the person of interest. We encode these interactions by dividing the immediate vicinity of the subject into a circular or log-circular grid. The influence of other people around the subject is measured as a function of the distance and relative angle between them. Similar to the person encoding, this is then passed through a GRU at every training step and the final output of the GRU is taken as the group features for hte subject.</p>
+							<p></p>
 
 							<h4><i>Incorporating Attention</i></h4>
 							<figure>
